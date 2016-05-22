@@ -1,10 +1,8 @@
-version = "1.1.5"
-
 import sys
-from ccfreeze import modulegraph
+from bbfreeze import modulegraph
 sys.modules['modulegraph'] = modulegraph
 
-from ccfreeze.freezer import Freezer
+from bbfreeze.freezer import Freezer
 
 version = "1.1.4"
 

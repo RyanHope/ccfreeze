@@ -5,22 +5,22 @@ from distutils.util import get_platform
 from pkg_resources import Distribution, PathMetadata, normalize_path
 from setuptools.command.easy_install import easy_install, get_script_args
 
-"""ccfreeze.bdist_ccfreeze
+"""bbfreeze.bdist_bbfreeze
 
-Implements the distutils 'bdist_ccfreeze' command.
+Implements the distutils 'bdist_bbfreeze' command.
 """
 
 __author__ = "Hartmut Goebel <h.goebel@goebel-consult.de>"
 __copyright__ = "Copyright 2008 by Hartmut Goebel <h.goebel@goebel-consult.de>"
-__licence__ = "Same as ccfreeze"
+__licence__ = "Same as bbfreeze"
 __version__ = "0.1"
 
 
-class bdist_ccfreeze(easy_install):
+class bdist_bbfreeze(easy_install):
     # this is a bit hackish: we inherit from easy_install,
     # but discard most of it
 
-    description = "freeze scripts using ccfreeze"
+    description = "freeze scripts using bbfreeze"
 
     user_options = [
         ('bdist-base=', 'b',
@@ -56,15 +56,15 @@ class bdist_ccfreeze(easy_install):
         if self.bdist_base is None:
             build_base = self.get_finalized_command('build').build_base
             self.bdist_base = os.path.join(build_base,
-                                           'ccfreeze.' + self.plat_name)
+                                           'bbfreeze.' + self.plat_name)
         self.script_dir = self.bdist_base
 
         if self.dist_dir is None:
             self.dist_dir = "dist"
 
     def run(self, wininst=False):
-        # import ccfreeze only thenabout to run the command
-        from ccfreeze import Freezer
+        # import bbfreeze only thenabout to run the command
+        from bbfreeze import Freezer
 
         # get information from egg_info
         ei = self.get_finalized_command("egg_info")

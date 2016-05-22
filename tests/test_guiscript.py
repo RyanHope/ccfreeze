@@ -6,11 +6,11 @@ except:
 
 import os
 
-import ccfreeze
+import bbfreeze
 
 if win32ui:
     def test_guiscript():
-        f = ccfreeze.Freezer()
+        f = bbfreeze.Freezer()
         f.addScript("ex-mbox.py", True)
         f()
         err = os.system("dist\\ex-mbox")
@@ -18,7 +18,7 @@ if win32ui:
 
 
 def test_guiscript2():
-    f = ccfreeze.Freezer()
+    f = bbfreeze.Freezer()
     f.addScript("hello-world.py", True)
     f()
 

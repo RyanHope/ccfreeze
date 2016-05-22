@@ -13,14 +13,14 @@ def main():
     if sys.platform == 'win32':
         install_requires.append("pefile")
 
-    setup(name="ccfreeze",
+    setup(name="bbfreeze",
           version=version,
           entry_points={
-                       "console_scripts": ['bb-freeze = ccfreeze:main', 'ccfreeze = ccfreeze:main'],
+                       "console_scripts": ['bb-freeze = bbfreeze:main', 'bbfreeze = bbfreeze:main'],
                                           "distutils.commands": [
-                                           "bdist_ccfreeze = ccfreeze.bdist_ccfreeze:bdist_ccfreeze"]},
+                                           "bdist_bbfreeze = bbfreeze.bdist_bbfreeze:bdist_bbfreeze"]},
           install_requires=install_requires,
-          packages=['ccfreeze', 'ccfreeze.modulegraph'],
+          packages=['bbfreeze', 'bbfreeze.modulegraph'],
           zip_safe=False,
           maintainer="Josh Brown",
           maintainer_email="cars1189@aol.com",

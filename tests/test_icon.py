@@ -3,7 +3,7 @@
 import os
 import sys
 
-import ccfreeze
+import bbfreeze
 
 
 def test_icon():
@@ -11,7 +11,7 @@ def test_icon():
 
 if sys.platform == 'win32':
     def test_icon():
-        f = ccfreeze.Freezer()
+        f = bbfreeze.Freezer()
         f.addScript("ex-mbox.py", False)
         f.setIcon('python.ico')
         f()
