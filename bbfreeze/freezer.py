@@ -165,8 +165,8 @@ class EggAnalyzer(object):
 
 
 def fullname(p):
-    import _bbfreeze_loader
-    return os.path.join(os.path.dirname(_bbfreeze_loader.__file__), p)
+    import _ccfreeze_loader
+    return os.path.join(os.path.dirname(_ccfreeze_loader.__file__), p)
 
 
 def getRecipes():
