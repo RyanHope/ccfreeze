@@ -1,4 +1,3 @@
-import subprocess
 import imp
 import os
 import re
@@ -15,6 +14,11 @@ import marshal
 from modulegraph import modulegraph
 
 modulegraph.replacePackage("_xmlplus", "xml")
+
+try:
+    import commands
+except:
+    import subprocess
 
 # workaround for win32com hacks.
 # see: http://starship.python.net/crew/theller/moin.cgi/WinShell
@@ -528,15 +532,24 @@ if __name__ == '__main__':
     def _getRPath(self, exe):
         os.environ["S"] = exe
 
-        status, out = subprocess.getstatusoutput("patchelf --version")
+        if sys.version_info[0] >= 3:
+            status, out = subprocess.getstatusoutput("patchelf --version")
+        else:
+            status, out = commands.getstatusoutput("patchelf --version")
 
         if status == 0:
-            status, out = subprocess.getstatusoutput("patchelf --print-rpath $S")
+            if sys.version_info[0] >= 3:
+                status, out = subprocess.getstatusoutput("patchelf --print-rpath $S")
+            else:
+                status, out = commands.getstatusoutput("patchelf --print-rpath $S")
             if status:
                 raise RuntimeError("patchelf failed: %r" % out)
             return out.strip() or None
 
-        status, out = subprocess.getstatusoutput("objdump -x $S")
+        if sys.version_info[0] >= 3:
+            status, out = subprocess.getstatusoutput("objdump -x $S")
+        else:
+            status, out = commands.getstatusoutput("objdump -x $S")
         if status:
             print("WARNING: objdump failed: could not determine RPATH by running 'objdump -x %s'" % exe)
             return None
@@ -554,7 +567,10 @@ if __name__ == '__main__':
         os.environ["S"] = exe
         os.environ["R"] = rpath
         print("running 'patchelf --set-rpath '%s' %s'" % (rpath, exe))
-        status, out = subprocess.getstatusoutput("patchelf --set-rpath $R $S")
+        if sys.version_info[0] >= 3:
+            status, out = subprocess.getstatusoutput("patchelf --set-rpath $R $S")
+        else:
+            status, out = commands.getstatusoutput("patchelf --set-rpath $R $S")
         if status != 0:
             print("WARNING: failed to set RPATH for %s: %s" % (exe, out))
 

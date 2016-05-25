@@ -1,9 +1,13 @@
 #! /usr/bin/env python
 
-import subprocess
 import os
 import re
 import sys
+
+try:
+    import commands
+except:
+    import subprocess
 
 if sys.platform == 'win32':
 
@@ -140,7 +144,10 @@ elif sys.platform.startswith("freebsd"):
 
     def _getDependencies(path):
         os.environ["P"] = path
-        s = subprocess.getoutput("ldd $P")
+        if sys.version_info[0] >= 3:
+            s = subprocess.getoutput("ldd $P")
+        else:
+            s = commands.getoutput("ldd $P")
         res = [x for x in re.compile(r"^ *.* => (.*) \(.*", re.MULTILINE).findall(s) if x]
         return res
 
@@ -151,7 +158,10 @@ elif sys.platform.startswith("sunos5"):
 
     def _getDependencies(path):
         os.environ["P"] = path
-        s = subprocess.getoutput("ldd $P")
+        if sys.version_info[0] >= 3:
+            s = subprocess.getoutput("ldd $P")
+        else:
+            s = commands.getoutput("ldd $P")
         res = [x for x in re.compile(r"^\t* *.*=>\t* (.*)", re.MULTILINE).findall(s) if x]
         return res
 
@@ -162,7 +172,10 @@ elif sys.platform.startswith("linux"):
 
     def _getDependencies(path):
         os.environ["P"] = path
-        s = subprocess.getoutput("ldd $P")
+        if sys.version_info[0] >= 3:
+            s = subprocess.getoutput("ldd $P")
+        else:
+            s = commands.getoutput("ldd $P")
         res = [x for x in re.compile(r"^ *.* => (.*) \(.*", re.MULTILINE).findall(s) if x]
         return res
 
