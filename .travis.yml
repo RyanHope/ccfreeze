@@ -9,6 +9,7 @@ env:
   - TOX_ENV=flake8
   - TOX_ENV=isort
   - TOX_ENV=pytest
+  - TOX_ENV=newloader
 
 install:
   - pip install tox
