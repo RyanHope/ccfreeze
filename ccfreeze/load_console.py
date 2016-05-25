@@ -34,7 +34,7 @@ def addldlibrarypath():
     if p not in paths:
         paths.insert(0, p)
         os.environ[LD_LIBRARY_PATH] = os.pathsep.join(paths)
-        # print "SETTING", LD_LIBRARY_PATH, os.environ[LD_LIBRARY_PATH]
+        # print("SETTING", LD_LIBRARY_PATH, os.environ[LD_LIBRARY_PATH])
         os.execv(sys.executable, sys.argv)
 
 
@@ -49,7 +49,7 @@ def addpath():
     if p not in paths:
         paths.insert(0, p)
         os.environ['PATH'] = os.pathsep.join(paths)
-        # print "SETTING PATH:", os.environ['PATH']
+        # print("SETTING PATH:", os.environ['PATH'])
 
 
 def addtcltk():
@@ -87,8 +87,8 @@ else:
     win32com.gen_py.__path__=[tmpdir]
 """
 
-# print "EXE:", sys.executable
-# print "SYS.PATH:", sys.path
+# print("EXE:", sys.executable)
+# print("SYS.PATH:", sys.path)
 
 addpath()
 # if sys.platform!='win32': # and hasattr(os, 'execv'):

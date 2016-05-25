@@ -72,7 +72,7 @@ class EggAnalyzer(object):
         deps = pkg_resources.working_set.resolve(dist.requires())
         for x in deps:
             if x not in self.used:
-                print "adding %s as a dependency of %s" % (x, dist)
+                print("adding %s as a dependency of %s" % (x, dist))
                 self.used.add(x)
 
     def usableWorkingSet(self):
@@ -130,7 +130,7 @@ class EggAnalyzer(object):
                 if dist.has_metadata("namespace_packages.txt"):
                     ns = list(dist.get_metadata_lines("namespace_packages.txt"))
                     if isinstance(m, modulegraph.Package) and m.identifier in ns:
-                        # print "SKIP:", ns, m
+                        # print("SKIP:", ns, m)
                         return None
 
                 self.add(dist)
@@ -140,11 +140,11 @@ class EggAnalyzer(object):
         tmp = [(x.project_name, x) for x in self.used]
         tmp.sort()
         if tmp:
-            print "=" * 50
-            print "The following eggs are being used:"
+            print("=" * 50)
+            print("The following eggs are being used:")
             for x in tmp:
-                print repr(x[1])
-            print "=" * 50
+                print(repr(x[1]))
+            print("=" * 50)
 
     def copy(self, destdir):
         for x in self.used:
@@ -154,9 +154,9 @@ class EggAnalyzer(object):
                 try:
                     path = getattr(x._provider, "egg_info", None) or x._provider.path
                 except AttributeError:
-                    print "Warning: cannot copy egg-info for", x
+                    print("Warning: cannot copy egg-info for", x)
                     continue
-                print "Copying egg-info of %s from %r" % (x, path)
+                print("Copying egg-info of %s from %r" % (x, path))
                 if os.path.isdir(path):
                     basename = "%s.egg-info" % x.project_name
                     shutil.copytree(path, os.path.join(destdir, basename))
@@ -243,7 +243,7 @@ class MyModuleGraph(modulegraph.ModuleGraph):
         else:
             fullname = name
 
-        # print "FIND_MODULE:", name, path, parent
+        # print("FIND_MODULE:", name, path, parent)
 
         if path is None:
             path = self.path
@@ -276,8 +276,8 @@ class MyModuleGraph(modulegraph.ModuleGraph):
                 pass
 
         if len(found) > 1:
-            print "WARNING: found %s in multiple directories. Assuming it's a namespace package. (found in %s)" % (
-                fullname, ", ".join(x[1] for x in found))
+            print("WARNING: found %s in multiple directories. Assuming it's a namespace package. (found in %s)" % (
+                fullname, ", ".join(x[1] for x in found)))
             for x in found[1:]:
                 modulegraph.addPackagePath(fullname, x[1])
 
@@ -426,10 +426,10 @@ class Freezer(object):
         for line in lines:
             if line.startswith(eicomment):
                 values = [x.strip("'\"") for x in line[len(eicomment):].strip().split(",")]
-                print path, "is an easy install entry script. running pkg_resources.require(%r)" % (values[0],)
+                print(path, "is an easy install entry script. running pkg_resources.require(%r)" % (values[0],))
                 pkg_resources.require(values[0])
                 ep = pkg_resources.get_entry_info(*values)
-                print "entry point is", ep
+                print("entry point is", ep)
                 return ep.module_name
         return None
 
@@ -482,7 +482,7 @@ if __name__ == '__main__':
         numApplied = 0
         for x in self._recipes:
             if x(self.mf):
-                print "*** applied", x
+                print("*** applied", x)
                 self._recipes.remove(x)
                 numApplied += 1
         return numApplied
@@ -530,7 +530,7 @@ if __name__ == '__main__':
 
         status, out = commands.getstatusoutput("objdump -x $S")
         if status:
-            print "WARNING: objdump failed: could not determine RPATH by running 'objdump -x %s'" % exe
+            print("WARNING: objdump failed: could not determine RPATH by running 'objdump -x %s'" % exe)
             return None
 
         tmp = re.findall("[ \t]+RPATH[ \t]*(.*)", out)
@@ -545,10 +545,10 @@ if __name__ == '__main__':
     def _setRPath(self, exe, rpath):
         os.environ["S"] = exe
         os.environ["R"] = rpath
-        print "running 'patchelf --set-rpath '%s' %s'" % (rpath, exe)
+        print("running 'patchelf --set-rpath '%s' %s'" % (rpath, exe))
         status, out = commands.getstatusoutput("patchelf --set-rpath $R $S")
         if status != 0:
-            print "WARNING: failed to set RPATH for %s: %s" % (exe, out)
+            print("WARNING: failed to set RPATH for %s: %s" % (exe, out))
 
     def ensureRPath(self, exe):
         if sys.platform not in ("linux2", "linux3", "sunos5"):
@@ -563,7 +563,7 @@ if __name__ == '__main__':
             return
 
         if current_rpath == expected_rpath:
-            # print "RPATH %s of %s is fine" % (current_rpath, exe)
+            # print("RPATH %s of %s is fine" % (current_rpath, exe))
             return
 
         print "RPATH %r of %s needs adjustment. make sure you have the patchelf executable installed." % (current_rpath, exe)
@@ -632,7 +632,7 @@ if __name__ == '__main__':
             try:
                 m = getattr(self, "_handle_" + x.__class__.__name__)
             except AttributeError:
-                print "WARNING: dont know how to handle", x
+                print("WARNING: dont know how to handle", x)
                 continue
             m(x)
 
@@ -716,7 +716,7 @@ if __name__ == '__main__':
 
     def _handle_CompiledModule(self, m):
         fn = m.identifier.replace(".", "/") + '.pyc'
-        print "WARNING: using .pyc file %r for which no source file could be found." % (fn,)
+        print("WARNING: using .pyc file %r for which no source file could be found." % (fn,))
         mtime = self._get_mtime(m.filename)
         self._writecode(fn, mtime, m.code)
 

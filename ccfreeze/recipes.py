@@ -235,7 +235,7 @@ def recipe_matplotlib(mf):
 
     mf.import_hook("matplotlib.numerix.random_array", m)
     backend_name = 'backend_' + matplotlib.get_backend().lower()
-    print "recipe_matplotlib: using the %s matplotlib backend" % (backend_name, )
+    print("recipe_matplotlib: using the %s matplotlib backend" % (backend_name, ))
     mf.import_hook('matplotlib.backends.' + backend_name, m)
     return True
 
@@ -251,13 +251,13 @@ def recipe_tkinter(mf):
         if tcldir:
             mf.copyTree(tcldir, "lib-tcl", m)
         else:
-            print "WARNING: recipe_tkinter: TCL_LIBRARY not set. cannot find lib-tcl"
+            print("WARNING: recipe_tkinter: TCL_LIBRARY not set. cannot find lib-tcl")
 
         tkdir = os.environ.get("TK_LIBRARY")
         if tkdir:
             mf.copyTree(tkdir, "lib-tk", m)
         else:
-            print "WARNING: recipe_tkinter: TK_LIBRARY not set. cannot find lib-tk"
+            print("WARNING: recipe_tkinter: TK_LIBRARY not set. cannot find lib-tk")
     else:
         import _tkinter
         from ccfreeze import getdeps
@@ -290,7 +290,7 @@ def recipe_gtk_and_friends(mf):
 
         for p in prefixes:
             if x.identifier.startswith(p):
-                print "SKIPPING:", x
+                print("SKIPPING:", x)
                 x.__class__ = ExcludedModule
                 retval = True
                 break
