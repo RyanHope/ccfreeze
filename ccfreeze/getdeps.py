@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import commands
+import subprocess
 import os
 import re
 import sys
@@ -84,7 +84,7 @@ if sys.platform == 'win32':
         try:
             pe = pefile.PE(path, True)
             dlls = [x.dll for x in pe.DIRECTORY_ENTRY_IMPORT]
-        except Exception, err:
+        except Exception as err:
             print("WARNING: could not determine binary dependencies for %r:%s" % (path, err))
             dlls = []
         return dlls
@@ -140,7 +140,7 @@ elif sys.platform.startswith("freebsd"):
 
     def _getDependencies(path):
         os.environ["P"] = path
-        s = commands.getoutput("ldd $P")
+        s = subprocess.getoutput("ldd $P")
         res = [x for x in re.compile(r"^ *.* => (.*) \(.*", re.MULTILINE).findall(s) if x]
         return res
 
@@ -151,7 +151,7 @@ elif sys.platform.startswith("sunos5"):
 
     def _getDependencies(path):
         os.environ["P"] = path
-        s = commands.getoutput("ldd $P")
+        s = subprocess.getoutput("ldd $P")
         res = [x for x in re.compile(r"^\t* *.*=>\t* (.*)", re.MULTILINE).findall(s) if x]
         return res
 
@@ -162,7 +162,7 @@ elif sys.platform.startswith("linux"):
 
     def _getDependencies(path):
         os.environ["P"] = path
-        s = commands.getoutput("ldd $P")
+        s = subprocess.getoutput("ldd $P")
         res = [x for x in re.compile(r"^ *.* => (.*) \(.*", re.MULTILINE).findall(s) if x]
         return res
 
@@ -191,7 +191,7 @@ def getDependencies(path):
             _cache[p] = r
             return r
 
-    if not isinstance(path, basestring):
+    if not isinstance(path, str):
         deps = set()
         for p in path:
             deps.update(getDependencies(p))

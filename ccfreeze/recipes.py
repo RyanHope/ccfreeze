@@ -217,7 +217,7 @@ def get_platform():
     return %r
 """ % (val,)
 
-    import codehack
+    from . import codehack
     m.code = codehack.replace_functions(m.code, repl)
     return True
 
@@ -310,7 +310,7 @@ def recipe_cElementTree25(mf):
 
 
 def recipe_cElementTree(mf):
-    m = mf.findNode("cElementTree")
+    m = mf.findNode("ElementTree")
 
     if not isRealModule(m):
         return None

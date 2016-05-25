@@ -1,4 +1,4 @@
-import commands
+import subprocess
 import imp
 import os
 import re
@@ -217,7 +217,7 @@ class MyModuleGraph(modulegraph.ModuleGraph):
 
         try:
             return modulegraph.ModuleGraph.find_module(self, name, [p], parent)
-        except ImportError, err:
+        except ImportError as err:
             pass
 
         if not os.path.isfile(p):
@@ -272,7 +272,7 @@ class MyModuleGraph(modulegraph.ModuleGraph):
                         append_if_uniq(res)
                     else:
                         return res
-            except ImportError, err:
+            except ImportError as err:
                 pass
 
         if len(found) > 1:
@@ -286,7 +286,8 @@ class MyModuleGraph(modulegraph.ModuleGraph):
 
         raise err
 
-    def load_module(self, fqname, fp, pathname, (suffix, mode, typ)):
+    def load_module(self, fqname, fp, pathname, suffixmodetyp):
+        (suffix, mode, typ) = suffixmodetyp
         if typ == 314:
             m = self.createNode(ZipModule, fqname)
             code = fp.get_code(fqname.replace(".", "/"))
@@ -302,7 +303,7 @@ class MyModuleGraph(modulegraph.ModuleGraph):
 
 
 def replace_paths_in_code(co, newname):
-    import new
+    import types
     if newname.endswith('.pyc'):
         newname = newname[:-1]
 
@@ -312,11 +313,18 @@ def replace_paths_in_code(co, newname):
         if isinstance(consts[i], type(co)):
             consts[i] = replace_paths_in_code(consts[i], newname)
 
-    return new.code(co.co_argcount, co.co_nlocals, co.co_stacksize,
-                     co.co_flags, co.co_code, tuple(consts), co.co_names,
-                     co.co_varnames, newname, co.co_name,
-                     co.co_firstlineno, co.co_lnotab,
-                     co.co_freevars, co.co_cellvars)
+    if sys.version_info[0] >= 3:
+        return types.CodeType(co.co_argcount, co.co_kwonlyargcount, co.co_nlocals, co.co_stacksize,
+                        co.co_flags, co.co_code, tuple(consts), co.co_names,
+                        co.co_varnames, co.co_filename, co.co_name,
+                        co.co_firstlineno, co.co_lnotab,
+                        co.co_freevars, co.co_cellvars)
+    else:
+        return types.CodeType(co.co_argcount, co.co_nlocals, co.co_stacksize,
+                        co.co_flags, co.co_code, tuple(consts), co.co_names,
+                        co.co_varnames, co.co_filename, co.co_name,
+                        co.co_firstlineno, co.co_lnotab,
+                        co.co_freevars, co.co_cellvars)
 
 
 def make_extension_loader(modname):
@@ -351,7 +359,7 @@ def _ccfreeze_import_dynamic_module():
         break
     if not found:
         try:
-            raise ImportError, "No module named %%s" %% __name__
+            raise ImportError("No module named %%s" %% __name__)
         finally:
             del sys.modules[__name__]
 
@@ -520,15 +528,15 @@ if __name__ == '__main__':
     def _getRPath(self, exe):
         os.environ["S"] = exe
 
-        status, out = commands.getstatusoutput("patchelf --version")
+        status, out = subprocess.getstatusoutput("patchelf --version")
 
         if status == 0:
-            status, out = commands.getstatusoutput("patchelf --print-rpath $S")
+            status, out = subprocess.getstatusoutput("patchelf --print-rpath $S")
             if status:
                 raise RuntimeError("patchelf failed: %r" % out)
             return out.strip() or None
 
-        status, out = commands.getstatusoutput("objdump -x $S")
+        status, out = subprocess.getstatusoutput("objdump -x $S")
         if status:
             print("WARNING: objdump failed: could not determine RPATH by running 'objdump -x %s'" % exe)
             return None
@@ -546,7 +554,7 @@ if __name__ == '__main__':
         os.environ["S"] = exe
         os.environ["R"] = rpath
         print("running 'patchelf --set-rpath '%s' %s'" % (rpath, exe))
-        status, out = commands.getstatusoutput("patchelf --set-rpath $R $S")
+        status, out = subprocess.getstatusoutput("patchelf --set-rpath $R $S")
         if status != 0:
             print("WARNING: failed to set RPATH for %s: %s" % (exe, out))
 
@@ -566,7 +574,7 @@ if __name__ == '__main__':
             # print("RPATH %s of %s is fine" % (current_rpath, exe))
             return
 
-        print "RPATH %r of %s needs adjustment. make sure you have the patchelf executable installed." % (current_rpath, exe)
+        print("RPATH %r of %s needs adjustment. make sure you have the patchelf executable installed." % (current_rpath, exe))
         self._setRPath(exe, expected_rpath)
 
     def __call__(self):
@@ -586,7 +594,7 @@ if __name__ == '__main__':
         # executable bit
         xconsole = os.path.join(self.distdir, "ccfreeze-console.exe")
         shutil.copy2(self.console, xconsole)
-        os.chmod(xconsole, 0755)
+        os.chmod(xconsole, 0o755)
         self.console = xconsole
 
         while 1:
@@ -689,7 +697,7 @@ if __name__ == '__main__':
 
         dst = os.path.join(self.distdir, name + ext)
         shutil.copy2(m.filename, dst)
-        os.chmod(dst, 0755)
+        os.chmod(dst, 0o755)
         # when searching for DLL's the location matters, so don't
         # add the destination file, but rather the source file
         self.binaries.append(m.filename)
@@ -746,7 +754,7 @@ if __name__ == '__main__':
     def _writecode(self, fn, mtime, code):
         code = replace_paths_in_code(code, fn)
         ziptime = time.localtime(mtime)[:6]
-        data = imp.get_magic() + struct.pack("<i", mtime) + marshal.dumps(code)
+        data = imp.get_magic() + struct.pack("<i", int(mtime)) + marshal.dumps(code)
         zinfo = zipfile.ZipInfo(fn, ziptime)
         if self.use_compression:
             zinfo.compress_type = zipfile.ZIP_DEFLATED
@@ -764,23 +772,23 @@ if __name__ == '__main__':
         if lm == 'symlink':
             assert os.path.dirname(src) == os.path.dirname(dst)
             os.symlink(os.path.basename(src), dst)
-            os.chmod(dst, 0755)
+            os.chmod(dst, 0o755)
         elif lm == 'hardlink':
             os.link(src, dst)
-            os.chmod(dst, 0755)
+            os.chmod(dst, 0o755)
         elif lm == 'loader':
             if gui_only and sys.platform == 'win32':
                 shutil.copy2(self.consolew, dst)
             else:
                 shutil.copy2(self.console, dst)
-            os.chmod(dst, 0755)
+            os.chmod(dst, 0o755)
 
             if self.icon and sys.platform == 'win32':
                 try:
                     from ccfreeze import winexeutil
                     # Set executable icon
                     winexeutil.set_icon(dst, self.icon)
-                except ImportError, e:
+                except ImportError as e:
                     raise RuntimeError("Cannot add icon to executable. Error: %s" % (e.message))
         else:
             raise RuntimeError("linkmethod %r not supported" % (self.linkmethod,))
@@ -798,13 +806,13 @@ if __name__ == '__main__':
     def _handle_Executable(self, m):
         dst = os.path.join(self.distdir, os.path.basename(m.filename))
         shutil.copy2(m.filename, dst)
-        os.chmod(dst, 0755)
+        os.chmod(dst, 0o755)
         self.adaptBinary(dst)
 
     def _handle_SharedLibrary(self, m):
         dst = os.path.join(self.distdir, os.path.basename(m.filename))
         shutil.copy2(m.filename, dst)
-        os.chmod(dst, 0755)
+        os.chmod(dst, 0o755)
         self.adaptBinary(dst)
 
     def showxref(self):

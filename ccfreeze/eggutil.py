@@ -180,7 +180,7 @@ def copyDistribution(distribution, destdir):
     for x in name2compile.values():
         try:
             code = compile(x.read() + '\n', x.name, 'exec')
-        except Exception, err:
+        except Exception as err:
             print("WARNING: Could not compile %r: %r" % (x.name, err))
             continue
 
