@@ -8,7 +8,7 @@ version = "1.1.5"
 
 
 def main():
-    install_requires = ["altgraph>=0.12", "ccfreeze-loader>=1.1.0"]
+    install_requires = ["altgraph>=0.12"]
 
     if sys.platform == 'win32':
         install_requires.append("pefile")
