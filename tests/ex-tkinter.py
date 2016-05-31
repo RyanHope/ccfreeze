@@ -1,5 +1,9 @@
 import os
-import Tkinter
+
+if sys.version_info[0] >= 3:
+    import tkinter
+else:
+    import Tkinter
 
 
 def main():
